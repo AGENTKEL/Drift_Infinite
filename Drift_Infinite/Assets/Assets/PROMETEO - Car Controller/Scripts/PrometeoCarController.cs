@@ -376,8 +376,8 @@ void Update()
       float targetSteeringAngle = steeringAxis * maxSteeringAngle;
 
       // Smoothly interpolate the current steering angle towards the target angle
-      frontLeftCollider.steerAngle = Mathf.Lerp(frontLeftCollider.steerAngle, targetSteeringAngle, steeringSpeed);
-      frontRightCollider.steerAngle = Mathf.Lerp(frontRightCollider.steerAngle, targetSteeringAngle, steeringSpeed);
+      frontLeftCollider.steerAngle = Mathf.Lerp(frontLeftCollider.steerAngle, targetSteeringAngle, steeringSpeed * 2);
+      frontRightCollider.steerAngle = Mathf.Lerp(frontRightCollider.steerAngle, targetSteeringAngle, steeringSpeed * 2);
     }
 
     // This method converts the car speed data from float to string, and then set the text of the UI carSpeedText with this value.

@@ -13,8 +13,8 @@ public class DriftSystem : MonoBehaviour
     public TextMeshProUGUI driftMultiplierText; // UI text to display drift multiplier
     public float pointsMultiplier = 1f; // Base multiplier
     public int driftMultiplier = 1; // Current drift multiplier
-    
-    public GameObject driftEffectPrefab;
+
+    public GameObject driftEffectPrefab; // Particle effect prefab
 
     private float driftTimer = 0f; // Timer to track how long the car has been drifting
     private float noDriftTimer = 0f; // Timer to track how long the car has stopped drifting
@@ -31,38 +31,37 @@ public class DriftSystem : MonoBehaviour
     {
         if (carController.isDrifting)
         {
-            // Reset no drift timer
-            noDriftTimer = 0f;
+            noDriftTimer = 0f; // Reset the no-drift timer
 
-            // Increment drift timer
             driftTimer += Time.deltaTime;
-
-            // Add drift points instantly
-            driftPoints += driftMultiplier; 
+            driftPoints += driftMultiplier; // Add drift points instantly
             UpdateDriftPointsUI();
 
-            // Increase multiplier every 2 seconds
-            if (driftTimer >= 2f)
+            // Dynamically increasing time to gain multipliers
+            float requiredDriftTime = 2f + (driftMultiplier - 1); // Takes longer for higher multipliers
+
+            if (driftTimer >= requiredDriftTime)
             {
                 driftMultiplier++;
-                GameObject effect = Instantiate(driftEffectPrefab, transform.position, Quaternion.identity);
+                Instantiate(driftEffectPrefab, transform.position, Quaternion.identity); // Spawn effect
                 driftTimer = 0f; // Reset drift timer
                 UpdateDriftMultiplierUI();
             }
         }
         else
         {
-            // Increase no-drift timer
+            driftTimer = 0f; // Reset drift timer if not drifting
             noDriftTimer += Time.deltaTime;
 
-            if (noDriftTimer >= 2f && driftMultiplier > 1)
+            // Dynamically decreasing time before losing multiplier
+            float decayTime = Mathf.Max(2f - ((driftMultiplier - 1) * 0.5f), 0.5f); // Takes less time to lose at high multipliers
+
+            if (noDriftTimer >= decayTime && driftMultiplier > 1)
             {
-                driftMultiplier--; // Decrease multiplier every 2 seconds of no drifting
+                driftMultiplier--; // Decrease multiplier
                 noDriftTimer = 0f; // Reset no-drift timer
                 UpdateDriftMultiplierUI();
             }
-
-            driftTimer = 0f; // Reset drift timer if not drifting
         }
     }
 
@@ -82,7 +81,6 @@ public class DriftSystem : MonoBehaviour
         }
     }
 
-    // Method to reset drift points and multiplier
     public void ResetDriftPoints()
     {
         driftPoints = 0;
