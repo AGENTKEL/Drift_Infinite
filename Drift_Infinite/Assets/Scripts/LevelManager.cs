@@ -10,12 +10,16 @@ public class LevelManager : MonoBehaviour
     [Header("Skybox Colors")]
     public List<Color> skyboxColors; // List of skybox colors for each level
 
+    private int selectedLevelIndex = -1; // Stores selected level index
+
+    public Animator animator; // Reference to animator
+
     private void Start()
     {
-        ActivateRandomLevel();
+        SelectRandomLevel();
     }
 
-    void ActivateRandomLevel()
+    public void SelectRandomLevel()
     {
         if (levelPrefabs.Count == 0)
         {
@@ -23,31 +27,52 @@ public class LevelManager : MonoBehaviour
             return;
         }
 
+        // Select a random level but do not activate it yet
+        selectedLevelIndex = Random.Range(0, levelPrefabs.Count);
+
+        // Set the correct animation bool based on selected level
+        if (animator != null)
+        {
+            animator.SetBool("Level1", selectedLevelIndex == 0);
+            animator.SetBool("Level2", selectedLevelIndex == 1);
+            animator.SetBool("Level3", selectedLevelIndex == 2);
+        }
+        else
+        {
+            Debug.LogWarning("LevelManager: Animator not assigned!");
+        }
+
+        Debug.Log("Selected Level: " + levelPrefabs[selectedLevelIndex].name);
+    }
+
+    public void ActivateLevel()
+    {
+        if (selectedLevelIndex == -1) return; // No level selected
+
         // Disable all levels
         foreach (GameObject level in levelPrefabs)
         {
             level.SetActive(false);
         }
 
-        // Select a random level
-        int randomIndex = Random.Range(0, levelPrefabs.Count);
-        levelPrefabs[randomIndex].SetActive(true);
+        // Activate selected level
+        levelPrefabs[selectedLevelIndex].SetActive(true);
 
         // Change the skybox color
-        if (randomIndex < skyboxColors.Count)
+        if (selectedLevelIndex < skyboxColors.Count)
         {
-            RenderSettings.skybox.SetColor("_Tint", skyboxColors[randomIndex]);
+            RenderSettings.skybox.SetColor("_Tint", skyboxColors[selectedLevelIndex]);
         }
-        
+
         if (RenderSettings.skybox.HasProperty("_Exposure"))
         {
-            RenderSettings.skybox.SetFloat("_Exposure", 0.4f);
+            RenderSettings.skybox.SetFloat("_Exposure", 0.5f);
         }
         else
         {
-            Debug.LogWarning("No skybox color assigned for level index: " + randomIndex);
+            Debug.LogWarning("No skybox color assigned for level index: " + selectedLevelIndex);
         }
 
-        Debug.Log("Activated Level: " + levelPrefabs[randomIndex].name);
+        Debug.Log("Activated Level: " + levelPrefabs[selectedLevelIndex].name);
     }
 }

@@ -20,7 +20,7 @@ namespace SimpleInputNamespace
 		private float wheelAngle = 0f;
 		private float wheelPrevAngle = 0f;
 
-		private bool wheelBeingHeld = false;
+		public bool wheelBeingHeld = false;
 
 		private float m_value;
 		public float Value { get { return m_value; } }
