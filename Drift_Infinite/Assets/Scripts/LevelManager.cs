@@ -1,9 +1,11 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using Cinemachine;
 using TMPro;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using Random = UnityEngine.Random;
 
 public class LevelManager : MonoBehaviour
 {
@@ -27,7 +29,12 @@ public class LevelManager : MonoBehaviour
     public List<Color> carColors = new List<Color> { Color.green, Color.yellow, Color.red, Color.blue, new Color(1.0f, 0.5f, 0.0f), Color.magenta }; // Orange & Pink
 
     private GameObject spawnedCar; // Reference to the spawned car
-    
+
+    private void Awake()
+    {
+        Application.targetFrameRate = 60;
+    }
+
 
     public void SelectRandomLevel()
     {
