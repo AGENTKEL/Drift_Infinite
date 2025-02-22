@@ -1,10 +1,13 @@
 using System.Collections;
 using System.Collections.Generic;
+using Cinemachine;
+using TMPro;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class LevelManager : MonoBehaviour
 {
-    [Header("Level Prefabs")]
+[Header("Level Prefabs")]
     public List<GameObject> levelPrefabs; // List of level prefabs
 
     [Header("Skybox Colors")]
@@ -14,10 +17,17 @@ public class LevelManager : MonoBehaviour
 
     public Animator animator; // Reference to animator
 
-    private void Start()
-    {
-        SelectRandomLevel();
-    }
+    [Header("UI")] 
+    [SerializeField] private GameObject results;
+    [SerializeField] private GameObject startScreen;
+    [SerializeField] private GameObject loadingScreen;
+    public TextMeshProUGUI finalScore;
+
+    [Header("Car Colors")]
+    public List<Color> carColors = new List<Color> { Color.green, Color.yellow, Color.red, Color.blue, new Color(1.0f, 0.5f, 0.0f), Color.magenta }; // Orange & Pink
+
+    private GameObject spawnedCar; // Reference to the spawned car
+    
 
     public void SelectRandomLevel()
     {
@@ -56,7 +66,8 @@ public class LevelManager : MonoBehaviour
         }
 
         // Activate selected level
-        levelPrefabs[selectedLevelIndex].SetActive(true);
+        GameObject selectedLevel = levelPrefabs[selectedLevelIndex];
+        selectedLevel.SetActive(true);
 
         // Change the skybox color
         if (selectedLevelIndex < skyboxColors.Count)
@@ -73,6 +84,72 @@ public class LevelManager : MonoBehaviour
             Debug.LogWarning("No skybox color assigned for level index: " + selectedLevelIndex);
         }
 
-        Debug.Log("Activated Level: " + levelPrefabs[selectedLevelIndex].name);
+        // Spawn the car in the level
+        SpawnCar(selectedLevel);
+
+        Debug.Log("Activated Level: " + selectedLevel.name);
+    }
+
+    private void SpawnCar(GameObject level)
+    {
+        Level levelData = level.GetComponent<Level>();
+        if (levelData == null)
+        {
+            Debug.LogError("LevelManager: LevelData component is missing on " + level.name);
+            return;
+        }
+
+        // Get a random spawn point
+        Transform spawnPoint = levelData.GetRandomSpawnPoint();
+        if (spawnPoint == null) return;
+
+        // Spawn the car
+        spawnedCar = Instantiate(levelData.carPrefab, spawnPoint.position, spawnPoint.rotation);
+
+        // Assign a random color
+        Renderer carRenderer = spawnedCar.GetComponentInChildren<Renderer>(); // Assuming the car has a Renderer
+        if (carRenderer != null)
+        {
+            carRenderer.material.color = carColors[Random.Range(0, carColors.Count)];
+        }
+        else
+        {
+            Debug.LogWarning("Spawned car does not have a Renderer!");
+        }
+
+        // Find and assign CinemachineVirtualCamera
+        CinemachineVirtualCamera cinemachineCam = FindObjectOfType<CinemachineVirtualCamera>();
+        if (cinemachineCam != null)
+        {
+            cinemachineCam.Follow = spawnedCar.transform;
+            cinemachineCam.LookAt = spawnedCar.transform;
+        }
+        else
+        {
+            Debug.LogWarning("CinemachineVirtualCamera not found in the scene!");
+        }
+    }
+
+    public void FinishRace()
+    {
+        results.SetActive(true);
+    }
+    
+    public void CloseResults()
+    {
+        SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
+    }
+    
+    public void StopQueue()
+    {
+        loadingScreen.SetActive(false);
+        startScreen.SetActive(true);
+    }
+    
+    public void StartQueue()
+    {
+        loadingScreen.SetActive(true);
+        SelectRandomLevel();
+        startScreen.SetActive(false);
     }
 }

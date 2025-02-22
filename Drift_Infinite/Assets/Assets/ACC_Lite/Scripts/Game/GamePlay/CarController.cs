@@ -17,6 +17,7 @@ public class CarController : MonoBehaviour, ISendData, IReceiveData
 	[SerializeField] Transform COM;
 	[SerializeField] List<ParticleSystem> BackFireParticles = new List<ParticleSystem>();
 	[SerializeField] private Rigidbody rb;
+	public Material carColorMaterial;
 
 	public CarConfig CarConfig;
 
@@ -140,6 +141,8 @@ public class CarController : MonoBehaviour, ISendData, IReceiveData
 		{
 			BackFireAction += () => particles.Emit (2);
 		}
+		
+		
 	}
 	
 	public object GetDataToSend()

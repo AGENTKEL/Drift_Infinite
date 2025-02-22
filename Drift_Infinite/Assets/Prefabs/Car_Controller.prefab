@@ -94,6 +94,7 @@ MonoBehaviour:
   maximumSteeringAngle: 200
   wheelReleasedSpeed: 350
   valueMultiplier: 0.5
+  wheelBeingHeld: 0
 --- !u!1 &365126411388784895
 GameObject:
   m_ObjectHideFlags: 0
@@ -506,7 +507,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1986029620748329663}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: f4688fdb7df04437aeb418b961361dc5, type: 3}
   m_Name: 
@@ -521,8 +522,9 @@ MonoBehaviour:
       m_Calls: []
   m_text: BOOST
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
-  m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: e2b4d801489ee7042a56ea781a85974b, type: 2}
+  m_sharedMaterial: {fileID: 2722230770289628755, guid: e2b4d801489ee7042a56ea781a85974b,
+    type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -919,7 +921,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_Color: {r: 0.7264151, g: 0.7264151, b: 0.7264151, a: 1}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
@@ -1123,7 +1125,7 @@ GameObject:
   - component: {fileID: 6030135659300990834}
   - component: {fileID: 1775027889120642499}
   m_Layer: 5
-  m_Name: Canvas
+  m_Name: Player_Name_Canvas
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1459,11 +1461,13 @@ MonoBehaviour:
   COM: {fileID: 1507473262736113495}
   BackFireParticles:
   - {fileID: 2065769198390135792}
+  rb: {fileID: 0}
+  carColorMaterial: {fileID: 2100000, guid: 2d997c6d92b71154e8dee74617594aea, type: 2}
   CarConfig:
-    MaxSteerAngle: 60
+    MaxSteerAngle: 70
     DriveType: 2
     AutomaticGearBox: 1
-    MaxMotorTorque: 600
+    MaxMotorTorque: 400
     MotorTorqueFromRpmCurve:
       serializedVersion: 2
       m_Curve:
@@ -1506,14 +1510,14 @@ MonoBehaviour:
       m_PreInfinity: 2
       m_PostInfinity: 2
       m_RotationOrder: 4
-    MaxRPM: 7000
-    MinRPM: 700
+    MaxRPM: 3000
+    MinRPM: 400
     CutOffRPM: 6600
     CutOffOffsetRPM: 500
     CutOffTime: 0.1
     ProbabilityBackfire: 0.2
-    RpmToNextGear: 6500
-    RpmToPrevGear: 3500
+    RpmToNextGear: 2900
+    RpmToPrevGear: 800
     MaxForwardSlipToBlockChangeGear: 0.25
     RpmEngineToRpmWheelsLerpSpeed: 15
     GearsRatio:
@@ -1521,21 +1525,23 @@ MonoBehaviour:
     - 2.36
     - 1.67
     - 1.312
+    - 1.1
     MainRatio: 3.56
     ReversGearRatio: 4
-    MaxBrakeTorque: 2000
+    MaxBrakeTorque: 4000
     EnableSteerAngleMultiplier: 1
     MinSteerAngleMultiplier: 0.05
     MaxSteerAngleMultiplier: 1
     MaxSpeedForMinAngleMultiplier: 250
     SteerAngleChangeSpeed: 240
     MinSpeedForSteerHelp: 20
-    HelpSteerPower: 0.8
+    HelpSteerPower: 0.6
     OppositeAngularVelocityHelpPower: 0.2
     PositiveAngularVelocityHelpPower: -0.1
     MaxAngularVelocityHelpAngle: 90
     AngularVelucityInMaxAngle: 0.5
     AngularVelucityInMinAngle: 2
+  MaxMotorTorque: 0
   driftSystem: {fileID: 38572834011153326}
   InHandBrake: 0
 --- !u!114 &9165576644468789626
@@ -1612,7 +1618,6 @@ MonoBehaviour:
   driftPoints: 0
   pointsMultiplier: 10
   driftMultiplier: 1
-  driftDecaySpeed: 0.5
   driftEffectPrefab: {fileID: 4593184484909914552, guid: 2e1e9506f5904a64b81744324fb7cd50,
     type: 3}
   explosion: {fileID: 8853312824838132444}
@@ -1621,6 +1626,9 @@ MonoBehaviour:
   driftPointsText: {fileID: 4013887419467139108}
   driftMultiplierText: {fileID: 4735084745271763378}
   boostedText: {fileID: 5908027816501658016}
+  gameplayCanvas: {fileID: 6861917035721825900}
+  levelManager: {fileID: 0}
+  isFinished: 0
 --- !u!114 &8853312824838132444
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1633,10 +1641,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1e91ff2176052b64a951f89e989c2412, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  explosionRadius: 20
-  safeRadius: 10
-  explosionForce: 10000
-  upwardsModifier: 1
+  explosionRadius: 30
+  safeRadius: 0
+  explosionForce: 15000
+  upwardsModifier: 2
   carLayer:
     serializedVersion: 2
     m_Bits: 256
@@ -1707,8 +1715,9 @@ MonoBehaviour:
       m_Calls: []
   m_text: 1st
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
-  m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: e2b4d801489ee7042a56ea781a85974b, type: 2}
+  m_sharedMaterial: {fileID: 2722230770289628755, guid: e2b4d801489ee7042a56ea781a85974b,
+    type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -1841,15 +1850,16 @@ MonoBehaviour:
       m_Calls: []
   m_text: x1
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
-  m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: e2b4d801489ee7042a56ea781a85974b, type: 2}
+  m_sharedMaterial: {fileID: 2722230770289628755, guid: e2b4d801489ee7042a56ea781a85974b,
+    type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
   m_fontColor32:
     serializedVersion: 2
-    rgba: 4278190080
-  m_fontColor: {r: 0, g: 0, b: 0, a: 1}
+    rgba: 4278255601
+  m_fontColor: {r: 0.94698536, g: 1, b: 0, a: 1}
   m_enableVertexGradient: 0
   m_colorMode: 3
   m_fontColorGradient:
@@ -7719,15 +7729,16 @@ MonoBehaviour:
       m_Calls: []
   m_text: 0
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
-  m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: e2b4d801489ee7042a56ea781a85974b, type: 2}
+  m_sharedMaterial: {fileID: 2722230770289628755, guid: e2b4d801489ee7042a56ea781a85974b,
+    type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
   m_fontColor32:
     serializedVersion: 2
-    rgba: 4278190080
-  m_fontColor: {r: 0, g: 0, b: 0, a: 1}
+    rgba: 4278255601
+  m_fontColor: {r: 0.94698524, g: 1, b: 0, a: 1}
   m_enableVertexGradient: 0
   m_colorMode: 3
   m_fontColorGradient:

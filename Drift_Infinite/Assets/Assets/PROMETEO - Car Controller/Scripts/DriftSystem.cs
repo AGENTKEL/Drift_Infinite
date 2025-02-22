@@ -28,6 +28,11 @@ public class DriftSystem : MonoBehaviour
     public TextMeshProUGUI driftPointsText; // UI text to display drift points
     public TextMeshProUGUI driftMultiplierText; // UI text to display drift multiplier
     public TextMeshProUGUI boostedText;
+    public GameObject gameplayCanvas;
+    
+    [SerializeField] private LevelManager levelManager;
+    
+    [SerializeField] private bool isFinished = false;
 
     private void Start()
     {
@@ -35,6 +40,9 @@ public class DriftSystem : MonoBehaviour
         {
             driftProgressSlider.value = 0f;
         }
+
+        levelManager = FindAnyObjectByType<LevelManager>();
+        isFinished = false;
     }
 
     private void Update()
@@ -53,17 +61,18 @@ public class DriftSystem : MonoBehaviour
 
             driftTimer += Time.deltaTime;
 
-            int pointsToAdd = driftMultiplier;
+            // Calculate drift points based on time
+            float pointsToAdd = driftMultiplier * pointsMultiplier * Time.deltaTime * 10f; // Scale by time
             if (isInDriftBoostZone)
             {
-                pointsToAdd *= 2; // Double points when in the drift boost zone
+                pointsToAdd *= 2; // Double points in the drift boost zone
             }
 
-            driftPoints += pointsToAdd; // Add drift points instantly
+            driftPoints += Mathf.RoundToInt(pointsToAdd); // Convert to integer for accuracy
             UpdateDriftPointsUI();
 
             // Dynamically increasing time to gain multipliers
-            float requiredDriftTime = 1f + (driftMultiplier - 1); // Takes longer for higher multipliers
+            float requiredDriftTime = 3f + (driftMultiplier - 3); // Takes longer for higher multipliers
 
             // Update the slider fill amount
             if (driftProgressSlider != null)
@@ -84,12 +93,13 @@ public class DriftSystem : MonoBehaviour
                 }
 
                 UpdateDriftMultiplierUI();
-                
-                carController.MaxMotorTorque += 200;
-                carController.CarConfig.MaxRPM += 1000;
-                carController.CarConfig.MinRPM += 100;
-                carController.CarConfig.RpmToNextGear += 1000;
-                carController.CarConfig.RpmToPrevGear += 1000;
+
+                // Adjust car settings dynamically
+                carController.MaxMotorTorque += 100;
+                carController.CarConfig.MaxRPM += 500;
+                carController.CarConfig.MinRPM += 50;
+                carController.CarConfig.RpmToNextGear += 500;
+                carController.CarConfig.RpmToPrevGear += 500;
             }
         }
         else
@@ -98,25 +108,26 @@ public class DriftSystem : MonoBehaviour
             noDriftTimer += Time.deltaTime;
 
             // Dynamically decreasing time before losing multiplier
-            float decayTime = Mathf.Max(2f - ((driftMultiplier - 2) * 0.5f), 0.5f); // Takes less time to lose at high multipliers
+            float decayTime = Mathf.Max(2f - ((driftMultiplier - 2) * 0.7f), 0.7f); // Takes less time to lose at high multipliers
 
             if (noDriftTimer >= decayTime && driftMultiplier > 1)
             {
                 driftMultiplier--; // Decrease multiplier
                 noDriftTimer = 0f; // Reset no-drift timer
                 UpdateDriftMultiplierUI();
-                carController.MaxMotorTorque -= 200;
-                carController.CarConfig.MaxRPM -= 1000;
-                carController.CarConfig.MinRPM -= 100;
-                carController.CarConfig.RpmToNextGear -= 1000;
-                carController.CarConfig.RpmToPrevGear -= 1000;
+
+                // Adjust car settings dynamically
+                carController.MaxMotorTorque -= 100;
+                carController.CarConfig.MaxRPM -= 500;
+                carController.CarConfig.MinRPM -= 50;
+                carController.CarConfig.RpmToNextGear -= 500;
+                carController.CarConfig.RpmToPrevGear -= 500;
             }
 
             if (driftProgressSlider != null)
             {
                 driftProgressSlider.value = 0f; // Reset slider when not drifting
             }
-            
         }
     }
 
@@ -156,6 +167,24 @@ public class DriftSystem : MonoBehaviour
             isInDriftBoostZone = true;
             boostedText.enabled = true;
         }
+
+        if (!isFinished)
+        {
+            if (other.CompareTag("Death"))
+            {
+                DeathActivate();
+                isFinished = true;
+            }
+        }
+        
+        if (!isFinished)
+        {
+            if (other.CompareTag("Finish"))
+            {
+                FinishRace();
+                isFinished = true;
+            }
+        }
     }
 
     private void OnTriggerExit(Collider other)
@@ -165,6 +194,21 @@ public class DriftSystem : MonoBehaviour
             isInDriftBoostZone = false;
             boostedText.enabled = false;
         }
+    }
+
+    private void DeathActivate()
+    {
+        Instantiate(driftEffectPrefab, transform.position, Quaternion.identity);
+        gameplayCanvas.SetActive(false);
+        levelManager.FinishRace();
+        levelManager.finalScore.text = driftPointsText.text;
+    }
+    
+    private void FinishRace()
+    {
+        gameplayCanvas.SetActive(false);
+        levelManager.FinishRace();
+        levelManager.finalScore.text = driftPointsText.text;
     }
 }
     
