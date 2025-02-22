@@ -92,7 +92,7 @@ MonoBehaviour:
     m_key: Horizontal
     value: 0
   maximumSteeringAngle: 200
-  wheelReleasedSpeed: 350
+  wheelReleasedSpeed: 500
   valueMultiplier: 0.5
   wheelBeingHeld: 0
 --- !u!1 &365126411388784895

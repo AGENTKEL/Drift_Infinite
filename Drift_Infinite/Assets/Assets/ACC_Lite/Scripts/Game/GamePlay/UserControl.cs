@@ -1,6 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using SimpleInputNamespace;
+﻿using SimpleInputNamespace;
 using UnityEngine;
 
 /// <summary>
