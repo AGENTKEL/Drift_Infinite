@@ -3,7 +3,8 @@ using UnityEngine;
 public class ScrollAnimator : MonoBehaviour
 {
     public LevelManager levelManager;
-    public GameObject canvas;
+    public GameObject loadingScreen;
+    public GameObject upperScreen;
     public GameObject stopButton;
 
     public void TriggerLevelActivation()
@@ -11,7 +12,8 @@ public class ScrollAnimator : MonoBehaviour
         if (levelManager != null)
         {
             levelManager.ActivateLevel();
-            canvas.SetActive(false);
+            loadingScreen.SetActive(false);
+            upperScreen.SetActive(false);
         }
         else
         {
@@ -28,6 +30,6 @@ public class ScrollAnimator : MonoBehaviour
     
     public void StopQueue()
     {
-        canvas.SetActive(false);
+        loadingScreen.SetActive(false);
     }
 }

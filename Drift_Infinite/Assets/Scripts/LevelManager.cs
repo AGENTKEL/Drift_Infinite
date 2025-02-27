@@ -6,7 +6,7 @@ using UnityEngine.SceneManagement;
 
 public class LevelManager : MonoBehaviour
 {
-[Header("Level Prefabs")]
+    [Header("Level Prefabs")]
     public List<GameObject> levelPrefabs; // List of level prefabs
 
     [Header("Skybox Colors")]
@@ -20,7 +20,11 @@ public class LevelManager : MonoBehaviour
     [SerializeField] private GameObject results;
     [SerializeField] private GameObject startScreen;
     [SerializeField] private GameObject loadingScreen;
+    [SerializeField] private GameObject upperMenu;
     public TextMeshProUGUI finalScore;
+    
+    [SerializeField] private GameObject claimButton;
+    [SerializeField] private GameObject claimedButton;
 
     [Header("Car Colors")]
     public List<Color> carColors = new List<Color> { Color.green, Color.yellow, Color.red, Color.blue, new Color(1.0f, 0.5f, 0.0f), Color.magenta }; // Orange & Pink
@@ -137,6 +141,7 @@ public class LevelManager : MonoBehaviour
     public void FinishRace()
     {
         results.SetActive(true);
+        upperMenu.SetActive(true);
     }
     
     public void CloseResults()
@@ -148,6 +153,7 @@ public class LevelManager : MonoBehaviour
     {
         loadingScreen.SetActive(false);
         startScreen.SetActive(true);
+        upperMenu.SetActive(true);
     }
     
     public void StartQueue()
@@ -155,5 +161,11 @@ public class LevelManager : MonoBehaviour
         loadingScreen.SetActive(true);
         SelectRandomLevel();
         startScreen.SetActive(false);
+    }
+    
+    public void ClaimRewards()
+    {
+        claimButton.SetActive(false);
+        claimedButton.SetActive(true);
     }
 }
